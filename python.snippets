@@ -114,7 +114,7 @@ snippet fields15
 #
 # Define type of fields (New API)
 #
-snippet fields
+snippet field
 	fields[[%tabstop:0 fields.Char
 1 fields.Integer
 2 fields.Float
@@ -197,9 +197,9 @@ snippet field13
     size=128,
     ${5}help='${4:Help note}')${6}
 # Attribute for fields
-snippet domain=
+snippet domain
 	domain=[('${1:state}', '${2:=}', '${3:done}')]
-snippet translate argument
+snippet translate
 	translate=True, ${1}
 snippet dp
 	digits_compute=dp.get_precision('${1:PrecisionName}'), ${2}
@@ -222,19 +222,14 @@ snippet related
 snippet default
 	default='${1:value}', ${2}
 #
-# Define function in osv.osv
+# Define function in osv.orm
 #
 snippet func_def_search
 	def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
-	    """
-	    ${1:Comment}
-	    """
 	    if context is None:
 	        context = {}
-
 	    res = super(${2:ClassName}, self).search(cr, uid, args, offset=offset, limit=limit, order=order, context=context, count=count)
-	    ${3}
-	    return res
+	    return res${3}
 snippet func_def_read
 	def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
 	    """
@@ -245,42 +240,24 @@ snippet func_def_read
 	        context = {}
 	    res = super(${1:ClassName}, self).read(cr, uid, ids, fields, context=context)
 	    #TODO : process on result
-	    ${3}
-	    return res
-snippet func def copy
+	    return res${3}
+snippet func_copy
 	def copy(self, cr, uid, id, default=None, context=None):
-	    """
-	    #TODO make doc string
-	    ${2:Comment this}
-	    """
 	    if context is None:
 	        context = {}
-	    #TODO : process on result
-	    ${3}
 	    return super(${1:ClassName}, self).copy(cr, uid, id, default, context=context)
-snippet func def default_get
+snippet func_default_get
 	def default_get(self, cr, uid, fields_list, context=None):
-	    """
-	    #TODO make doc string
-	    ${1:Comment this}
-	    """
 	    if context is None:
 	        context = {}
 	    values = super(${2:ClassName}, self).default_get(cr, uid, fields_list, context=context)
-	    ${3}
 	    return values
-snippet func def fields_get
+snippet func_fields_get
 	def fields_get(self, cr, uuid, fields=None, context=None):
-	    """
-	    #TODO make doc string
-	    ${2:Comment this}
-	    """
 	    if context is None:
 	        context = {}
-	    #TODO : process on result
-	    ${3}
 	    return super(${1:ClassName}, self).fields_get(cr, uid, fields, context, read_access)
-snippet func def init
+snippet func_init
 	def init(self, cr):
 	    """
 	    ${2:Comment this}
@@ -351,7 +328,7 @@ snippet func_fields
 	            ${4:field_name}: ${3:value},
 	        }
 	    return result
-snippet func fields_view_get v 6.0
+snippet func_fields_view_get
 	def fields_view_get(self, cr, uid, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
 	    """
 	    Comment here
@@ -367,7 +344,7 @@ snippet func fields_view_get v 6.0
 	    }
 	    return result
 ###
-## Common method define in osv.osv
+## Common method define in osv.orm
 ##
 snippet read_
 	self.read(cr, uid, ${1:ids}, ['${2:field}'], context=context)${3}
@@ -415,44 +392,31 @@ snippet _ _constraints
 	_constraints = [
 	    ($1, 'Error: Invalid Message', ['${2:field_name}']),
 	]
-snippet date_name
-	_date_name='${1:Date field}'
 snippet constraints
 	_sql_constraints = [
-	    ('${1:Field name}_unique', 'UNIQUE ($1)', 'The $1 of the OpenERPModel must be unique !'),
+	    ('${1:Field name}_unique', 'UNIQUE ($1)', 'The $1 of the OdooModel must be unique !'),
 	_sql_constraints = [
 	    ('${1:Field name}_check', 'CHECK ($1)', 'Check error for $1 !'),
 	]
+snippet psql
+	select company_id, id, parent_id,
+	           case when parent_id IS NULL then id
+	                   else parent_id
+	           end as tmp
+	from res_partner;
+
+
+	Copy (Select * From foo) To '/home/erp/test.csv' With CSV;
+	\copy (Select * From foo) To '/tmp/test.csv' With CSV
+
+	>psql dbname
+	psql>\o '/tmp/output.csv'
+	psql>SELECT * from users;
+	psql>\q
 snippet _ _sql
 	_sql = """${1:CREATE TABLE .....}"""
 snippet _ _log_access
 	_log_access = False
-snippet . search (Old API)
-	.search(cr, uid, ${1:domain}, offset=${2:0}, limit=${3:None}, order=${4:None}, context=${5:context})${6}
-snippet . browse (Old API)
-	.browse(cr, uid, ${1:ids}, context=${2:context})${3}
-snippet . read (Old API)
-	.read(cr, uid, ${1:ids}, ['${2:name}'], context=${3:context})${4}
-snippet . create (Old API)
-	.create(cr, uid, ${1:vals}, context=${2:context})${3}
-snippet . write (Old API)
-	.write(cr, uid, ${1:ids}, ${2:vals}, context=${3:context})${4}
-snippet . unlink (Old API)
-	.unlink(cr, uid, ${1:ids}, context=${2:context})${3}
-snippet . copy (Old API)
-	.copy(cr, uid, ${1:id}, ${2:default}, context=${3:context})${4}
-snippet . search (New API)
-	.search(${1:domain}, offset=${2:0}, limit=${3:None}, order=${4:None})${5}
-snippet . browse (New API)
-	.browse(${1:ids})${2}
-snippet . create (New API)
-	.create(${1:vals})${2}
-snippet . write (New API)
-	.write(${1:vals})${2}
-snippet . unlink (New API)
-	.unlink()${1}
-snippet . copy (New API)
-	.copy(${1:default})${2}
 ###
 ## define exception
 	raise orm.except_orm(_('${1:Error}'), _('${2:Message}'))
@@ -460,23 +424,15 @@ snippet . copy (New API)
 	raise exceptions.RedirectWarning(_('${1:Message}'), ${2:action_id}, _('${3:Button Text}'))
 ###
 ## Cursor
-snippet cr cr.execute()
-	cr.execute("""${1:Query}""")
-snippet cr cr.mogrify()
-	cr.mogrify("""${1:Query}""")
-snippet cr cr.commit()
+snippet crcr
+    cr.execute(query)
+    [id for field, id in cr.fetchall()]
+snippet cr_all
+	cr.mogrify("SELECT %s, %s, %s;", (None, True, False))  -> 'SELECT NULL, true, false;'
 	cr.commit()
-snippet cr cr.rollback()
 	cr.rollback()
-snippet cr cr.close()
-	cr.close()
-snippet cr cr.autocommit()
 	cr.autocommit(${1:True})
-snippet cr cr.fetchall()
-	cr.fetchall()
-snippet cr cr.dictfetchall()
 	cr.dictfetchall()
-snippet cr cr.fetchone()
 	cr.fetchone()
 # Usefull tips
 snippet pooler
@@ -490,15 +446,7 @@ snippet !context
 # Usefull Snippet
 #
 snippet active
-	'active': fields.boolean('${1:Active}', help='if check, ${2:this object is always available}'),${3}
-snippet sequence
-	'sequence': fields.integer('${1:Sequence}'),${2}
-snippet color
-	'color': fields.integer('${1:Colour}'),
-	# PLEASE ADD A DEFAULT VALUE 0 FOR THE color FIELD!
-snippet state
-	'state': fields.selection(${1:[('', '')]}, '${2:Label}', help='${3:Help note}'),${4}
-	# PLEASE ADD A DEFAULT VALUE (e.g. draft) FOR THE state FIELD!
+	active = fields.Boolean(help='if check, this object is always available')
 snippet logger
 	import netsvc
 	logger = netsvc.Logger()
@@ -515,25 +463,13 @@ snippet log Warning
 	logger.warning('${1}')
 snippet log Error
 	logger.error('${1}')
-snippet ctx
-	ctx = context.copy()
 #
 # Other python declaration
 #
-snippet fm
-# New Function
 snippet super
 	super(${1:ClassName}, self).${2:methodName}(cr, uid, ${3:ids}, ${4}context=context)${5}
 snippet def
-	def ${1:fname}(${2:`indent('.') ? 'self' : ''`}):
-	    """${3:docstring for $1}"""
-	    ${4:pass}
-snippet deff
-	def ${1:fname}(${2:`indent('.') ? 'self' : ''`}):
-	    ${3}
-# New Method
-snippet defs
-	def ${1:mname}(self, ${2:arg}):
+	def ${1:mname}(${2:arg}):
 	    ${3:pass}
 # New Property
 snippet property
@@ -548,29 +484,34 @@ snippet ld
 	${1:var} = lambda ${2:vars} : ${3:action}
 snippet self.
 	self.${1:method}(${2})
-snippet try Try/Except
+snippet try
+	try[[%tabstop:0 Try/Except
+1 Try/Except/Else
+2 Try/Except/Finally
+3 Try/Except/Else/Finally]]
+snippet try0
 	try:
 	    ${1:pass}
-	except ${2:Exception}, ${3:e}:
+	except ${2:Exception} as ${3:e}:
 	    ${4:raise $3}
-snippet try Try/Except/Else
+snippet try1
 	try:
 	    ${1:pass}
-	except ${2:Exception}, ${3:e}:
+	except ${2:Exception} as ${3:e}:
 	    ${4:raise $3}
 	else:
 	    ${5:pass}
-snippet try Try/Except/Finally
+snippet try2
 	try:
 	    ${1:pass}
-	except ${2:Exception}, ${3:e}:
+	except ${2:Exception} as ${3:e}:
 	    ${4:raise $3}
 	finally:
 	    ${5:pass}
-snippet try Try/Except/Else/Finally
+snippet try3
 	try:
 	    ${1:pass}
-	except ${2:Exception}, ${3:e}:
+	except ${2:Exception} as ${3:e}:
 	    ${4:raise $3}
 	else:
 	    ${5:pass}
@@ -580,56 +521,354 @@ snippet try Try/Except/Else/Finally
 snippet ifmain
 	if __name__ == '__main__':
 	    ${1:main()}
+snippet store
+	{
+	    'objectname': (
+	        functionname,
+	        ['fieldname1', 'fieldname2'],
+	        priority)
+	}
+
+	store={
+	    'account.invoice': (_get_invoice_partner, ['state'], 10),
+	    'membership.membership_line': (_get_partner_id,['state'], 10),
+	    'res.partner': (
+	        lambda self, cr, uid, ids, c={}: ids,
+	        ['free_member'],
+	        10)
+	        }
 snippet pdb
 	import pdb; pdb.set_trace()
-snippet date to_string
+snippet datee
+# http://pymotw.com/2/datetime/
+	from datetime import datetime, timedelta
+	format = "%Y-%m-%d"
+	today = datetime.today()
+	s = today.strftime(format)
+	print 'strftime:', s
+	d = datetime.strptime(s, format)
+	print 'strptime:', d.strftime(format)
+	date_in_past = datetime.now() + timedelta(-INTERVAL_TIME)
+snippet date_to_string
 	fields.Datetime.to_string(${1:datetime instance})${2}
-snippet date from_string
+snippet date_from_string
 	fields.Datetime.from_string(${1:datetime string})${2}
 # workflow
-snippet trg trg_write
+snippet trg
+	trg[[%tabstop:0 trg_write
+1 trg_trigger
+2 trg_delete
+3 trg_create
+4 trg_validate
+5 trg_redirect]]
+snippet trg0
 	wf_service = netsvc.LocalService("workflow")
 	wf_service.trg_write(uid, '${1:model}', ${2:id}, cr)
-snippet trg trg_trigger
+snippet trg1
 	wf_service = netsvc.LocalService("workflow")
 	wf_service.trg_trigger(uid, '${1:model}', ${2:id}, cr)
-snippet trg trg_delete
+snippet trg2
 	wf_service = netsvc.LocalService("workflow")
 	wf_service.trg_delete(uid, '${1:model}', ${2:id}, cr)
-snippet trg trg_create
+snippet trg3
 	wf_service = netsvc.LocalService("workflow")
 	wf_service.trg_create(uid, '${1:model}', ${2:id}, cr)
-snippet trg trg_validate
+snippet trg4
 	wf_service = netsvc.LocalService("workflow")
 	wf_service.trg_validate(uid, '${1:model}', ${2:id}, '${3:signal}', cr)
-snippet trg trg_redirect
+snippet trg5
 	wf_service = netsvc.LocalService("workflow")
 	wf_service.trg_redirect(uid, '${1:model}', ${2:id}, ${3:new id}, cr)
 snippet context_get
 	context = self.pool.get('res.users').context_get(cr, uid)
-# Decorators
-snippet @ model
-	@api.model
-snippet @ returns
-	@api.returns('${1:model}')${2}
-snippet @ constrains
-	@api.constrains('${1:field}')${2}
-snippet @ onchange
-	@api.onchange('${1:field}')${2}
-snippet @ depends
-	@api.depends('${1:field.chain}')${2}
 # Environment access
-snippet env user
+snippet envv
+	env[[%tabstop:0 user
+1 env.ref('xml id')
+2 env['model']
+3 new env ->  env(${1:cr}, ${2:uid}, ${3:context})
+4 with_env
+5 with_context
+6 sudo]]
+snippet env0
 	self.env.user
-snippet env ref
+snippet env1
 	self.env.ref('${1:xml id}')${2}
-snippet env model
+snippet env2
 	self.env['${1:model}']${2}
-snippet env new env
+snippet env3
 	self.env(${1:cr}, ${2:uid}, ${3:context})${4}
-snippet env with_env
+snippet env4
 	self.env.with_env(${1:env})${2}
-snippet env with_context
+snippet env5
 	self.env.with_context(${1:context})${2}
-snippet env sudo
+snippet env6
 	self.env.sudo(${1:uid})${2}
+snippet z
+	z[[%tabstop:s String
+l List
+d Dict
+t Tuple
+file
+wholedb
+init
+logger
+migr
+onchange
+cmt
+copy
+import
+name_get
+peek
+resource
+obj_ref]]
+snippet zs
+	split : myStr = "Cet exemple, parmi d'autres"  :
+	myStr.split(',') -> ['Cet exemple', " parmi d'autres"]
+	join(liste) : b=["Bête", "à", "manger", "du", "foin"]
+	print("--".join(b)) -> Bête--à--manger--du--foin
+	myStr.find(sch) : cherche position de sch dans la chaine
+	myStr.count(sch) : cpte nbr sch dans la chaîne
+	myStr.lower() et upper() : minusc./majuscules
+	myStr.title() : convertit en majuscule l’initiale de chaque mot
+	myStr.capitalize() : convert. majuscule la 1ère lettre / chaîne
+	myStr.strip() : enlève espaces début / fin de la chaîne
+	myStr.replace(old, new[, maxreplace]) # return a copy
+	myStr.translate(None, '_?*')  # replace chars by None
+	myStr.index(car, [start]) : retrouve l’indice (index) de la 1ère occurrence de car dans la chaîne à partir de start
+	built-in : len(myStr)
+	ord(ch) -> valeur id numérique du caractère
+	unichr(num) -> caractère associée à l'id numérique
+snippet zl
+	ajout : maListe.append('Samedi')
+	    maListe.insert(1,b) → (indice, valeur)
+	    maListe[3:3] = ['Joudi', 'Vendi'] -> ajoute ou insert
+	Extraction :
+	    maListe[3:5] -> retourne valeurs des indices 3 et 4
+	    maListe.pop(indice) → retourne et retire l'indice ou dern indice
+	    maListe[u:v:w] → sélection de u:v au pas de w
+	    maListe[::2] = affiche du second au dernier au pas de 2
+	Effacer  :
+	    del(maListe[1:3]) → efface les indexes 1 à 2
+	    maListe[1:3] = [] → efface les indexes 1 à 2
+	    maListe.remove(3) → efface la valeur(s) 3
+	Remplacement  :
+	    maListe[1:3] = ['Mourdi'] -> replace index 1 à 2 par 1 valeur
+	    maListe[1:] = ['Manchdi', 'Loundi'] -> remplace x val par 2 val
+	Création liste de nombres  :
+	    maListe = list(range(2,15,3)) -> [2,5,8,11,14]  # incrément de 3
+	    list(range(n)) → [0, ..., n-1]
+	    list(range(10,-10,-3))
+	    [0] * 5 -> [0, 0, 0, 0, 0]
+	    list * 3 -> duplique les items 2 fois
+	for n in range(10, 18, 3): -> parcours liste de nombres
+	randrange() -> utilisation des arguments idem à range()
+	Recherche d'index selon valeur  : liste.index(17)
+	Compte valeurs : liste.count('val')
+	Duplication  :
+	    alias : maListe2 = maListe1 -> copie de la réf mais pas la liste
+	    copie : maListe2 = maListe1[:]
+	    Fusion : list1.extend(list2) ; list1+list2
+	Tri  :
+	    nombres.sort() -> tri la liste
+	    newTabSorted = sorted(nombres, reverse=True) -> reverse=True : tri à l'envers
+	    nombres.reverse() -> tri les indexes dans l'ordre inverse
+	fonctions utiles : sum, min, max.
+	ma_liste = [1, 2, 3, 4, 5, 6, 7, 8]
+	[nb * nb for nb in ma_liste if nb%2==0]
+
+	mvar = [key for key, val in main_var.items() if val==aaa][0]
+snippet zd
+	Création : dic1 = {'0': 'test', 'pic': 9}
+	Modif : dic1['0'] = 'new_val'
+	dic1.pop('pic'[, 'default']) # retourne et efface l'élément 'pic'  s'il existe sinon retourne 'default'
+	  del dic1['pic']  # efface 1 élément
+	    popitem() → efface le 1er élément de la liste
+	Merge : d1.update(d2) # clés existantes écrasées
+	dic2 = dic1       # copie la référence du dico
+	 dic2 = dic1.copy()    # clonage partiel (réf. pour les listes)
+	Clés : dic1.has_key('a') → 'a' in dic1
+	    dic1.keys() → ['0', 'pic'] ; dic1.values() → ['test', 9]
+	i=dic1.iteritems() >>> i.next() → (0, 'test')  #iterkeys/itervalues
+	get(cle [, default]) # return value from cle if exist else default
+	setdefault(cle, default) → update selon index ou insertion
+	l.fromkeys([1,2],0) → (ré)initialisation à la même valeur
+	dict(zip(keys, vals)) complete dict with 2 lists
+	__len__()
+	for cle in mondic :
+	for valeur in mondic.values() :
+	    if 21 in mondic.values() :
+	http://stackoverflow.com/a/9668200
+	for cle, valeur in mondic.items() : # associe le dico aux vars
+snippet zt
+	tuple = ('a', 'b', 'c', 'd', 'e')
+	tuple = ('André',) + tuple[1:]
+	for elt in enumerate(ma_liste) :
+	    print(elt)
+	>> (0, 'a')     (1, 'b')
+snippet zobj_ref
+	_, res_id = self.pool['ir.model.data'].get_object_reference(cr, uid, 'modulename', 'xmlid')
+snippet zfile
+	#os.path.realpath('./')
+	# a ou w
+	with open("x.txt", 'w') as f:
+	    data = f.read(7) # lit les 7 prems caract ; tous si no arg
+	    data = f.read()
+	    f.write(datas.decode('base64'))
+	# json
+	import json
+	out = json.dumps({'4': 5, '6': 7}, sort_keys=True, indent=4, separators=(',', ': '))
+	# iterate fichiers d'un dossier :
+	import os
+	for file in os.listdir("/mydir"):
+	    if file.endswith(".txt"):
+	        print file
+snippet zwholedb
+	# search in whole db
+	CREATE OR REPLACE FUNCTION search_columns(
+	    needle text,
+	    haystack_tables name[] default '{}',
+	    haystack_schema name[] default '{public}'
+	)
+	RETURNS table(schemaname text, tablename text, columnname text, rowctid text)
+	AS $$
+	begin
+	  FOR schemaname,tablename,columnname IN
+	      SELECT c.table_schema,c.table_name,c.column_name
+	      FROM information_schema.columns c
+	      JOIN information_schema.tables t ON
+	        (t.table_name=c.table_name AND t.table_schema=c.table_schema)
+	      WHERE (c.table_name=ANY(haystack_tables) OR haystack_tables='{}')
+	        AND c.table_schema=ANY(haystack_schema)
+	        AND t.table_type='BASE TABLE'
+	  LOOP
+	    EXECUTE format('SELECT ctid FROM %I.%I WHERE cast(%I as text) ~ %L',
+	       schemaname,
+	       tablename,
+	       columnname,
+	       needle
+	    ) INTO rowctid;
+	    IF rowctid is not null THEN
+	      RETURN NEXT;
+	    END IF;
+	 END LOOP;
+	END;
+	$$ language plpgsql;
+	
+	-- http://stackoverflow.com/a/23036421/2819823
+	-- select * from search_columns('modulename');
+	-- select * from grep_columns('modulename', array(select table_name::name from information_schema.tables where table_name like 's%'), array['public']);
+	-- EXECUTE format('SELECT ctid FROM %I.%I WHERE cast(%I as text)=%L',
+snippet zinit
+class AbstractPicking(orm.AbstractModel):
+	    _name = 'abstract'
+	    _description = "Abstract "
+	
+	    _columns = {
+	        'aaa': fields.char(
+	            'aaa',
+	            help=""),
+	    }
+
+	class StockPicking(orm.Model):
+	    _inherit = ['stock.picking', 'abstract']
+	    _name = 'stock.picking'
+
+	    # Due to this bug https://bugs.launchpad.net/openobject-addons/+bug/1169998
+	    # you need do declare new fields in both picking models
+	    def __init__(self, pool, cr):
+	        super(StockPicking, self).__init__(pool, cr)
+	        for field in FIELDS:
+	            self._columns[field] = \
+	                self.pool['abstract']._columns[field]
+snippet zmigr
+	update ir_module_module_dependency set name = 'new' where name='old';
+	update ir_module_module set name = 'new' where name='old';
+	update ir_model_data set module = 'new' where module='old';
+snippet zresource
+    def fct_resource(self, cr, uid, ids, field_n, arg, context=None):
+	        from datetime import datetime, timedelta
+	        today = datetime.today()
+	        days3 = today + timedelta(days=3)
+	        calendar_id = 1
+	        workc = 6
+	        res_cal = self.pool['resource.calendar']
+	        resource_calendar_id = res_cal.browse(cr, uid, calendar_id, context=context)
+	        wwww = res_cal.working_hours_on_day(
+	            cr, uid, resource_calendar_id, today, context=context)
+	        # Tps de travail 9.0
+	        print 'Tps de travail ', wwww
+	        lea = res_cal._get_leaves(cr, uid, calendar_id, workc)
+	        # lea ['2015-03-03']    jours de congés
+	        print 'lea', lea
+	        inter = res_cal.interval_min_get(cr, uid, calendar_id, today, 12, resource=workc)
+	        # le 2 mars => interval_min_get() remonte dans la passé
+	        # interval_min_get [(datetime.datetime(2015, 2, 27, 11, 0), datetime.datetime(2015, 2, 27, 12, 0)), (datetime.datetime(2015, 2, 27, 13, 0), datetime.datetime(2015, 2, 27, 18, 0)), (datetime.datetime(2015, 3, 2, 8, 0), datetime.datetime(2015, 3, 2, 12, 0)), (datetime.datetime(2015, 3, 2, 13, 0), datetime.datetime(2015, 3, 2, 15, 0))]
+	        print 'interval_min_get', inter
+	        interval_get = res_cal.interval_get(cr, uid, calendar_id, today, 15, resource=workc)
+	        # va dans le futur en tenant des congès
+	        # interval_get [(datetime.datetime(2015, 3, 2, 15, 0), datetime.datetime(2015, 3, 2, 18, 0)), (datetime.datetime(2015, 3, 4, 8, 0), datetime.datetime(2015, 3, 4, 12, 0)), (datetime.datetime(2015, 3, 4, 13, 0), datetime.datetime(2015, 3, 4, 18, 0)), (datetime.datetime(2015, 3, 5, 8, 0), datetime.datetime(2015, 3, 5, 11, 0))]
+	        print 'interval_get', interval_get
+	        interval_hours_get = res_cal.interval_hours_get(
+	            cr, uid, calendar_id, today, days3, resource=workc)
+	        # interval_hours_get 18.0    intervalle entre 2 dates
+	        print 'interval_hours_get', interval_hours_get
+	        return {ids[0]: wwww}
+snippet zlogger
+	import logging
+	logger = logging.getLogger(__name__)
+	logger.debug("%s" %tmp)
+snippet zonchange
+    def onchange_pricelist_id(self, cr, uid, ids, pricelist_id, context=None):
+	        warning = {
+	            'title': _('Warning'),
+	            'message': _('If you change the pricelist of the backend, '
+	                         'the price of all the products will be updated '
+	                         'in Magento.')
+	        }
+	        return {'warning': warning}
+	
+	    <field name="price_discount"
+	           on_change="onchange_price_presta(discount, surcharge, context)" context="{'reduction_type': 'discount'}" />
+	
+	    def onchange_price_presta(self, cr, uid, ids, discount, surcharge,
+	                                                                context=None):
+	        if discount != 0 and surcharge != 0:
+	            if context.get('reduction_type') == 'discount':
+	                value = {'surcharge': 0}
+	            else:
+	                value = {'discount': 0}
+	            return {'value': value}
+	        return True
+snippet zcmt
+	        """
+	        :param p1: current Env
+	        :type p1: :py:class:`conn.Env`
+	        :rtype: list
+	        """
+snippet zimport
+from openerp.osv import fields, orm
+	import openerp.addons.decimal_precision as dp
+	from openerp.tools.translate import _
+
+	class MyModelClass(orm.Model):
+snippet zname_get
+	    def name_get(self, cr, uid, ids, context=None):
+	        res = []
+	        for r in self.read(cr, uid, ids,
+	                           ['name', 'store_id'], context=context):
+	            res.append((r['id'], '%s (%s)'
+	                        % (r['name'], r['store_id'][1])))
+	        return res
+snippet zcopy
+	    def copy(self, cr, uid, id, default=None, context=None):
+	        if default is None:
+	            default = {}
+	        default['myfield'] = False
+	        return super(myclass, self).copy(cr, uid, id,
+	                                                default, context=context)
+snippet zpeek
+	ids = model('').search(["state = 'failed'"])
+	model('').button_done(ids)
+	mybrowse = model('').browse(['id = 36'])
+	myread = model('').read(['id>691', 'id<772'], 'id')

@@ -28,6 +28,7 @@ mapping = {'xml.snippets': 'XML',
            'python.snippets': 'Python-common'}
 
 MYFILE = 'xml.snippets'
+MYFILE = 'python.snippets'
 
 KOMODO_SNIPPET_FORMAT = """{
   "keyboard_shortcut": "",
