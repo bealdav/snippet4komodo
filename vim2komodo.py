@@ -27,9 +27,6 @@ import re
 mapping = {'xml.snippets': 'XML',
            'python.snippets': 'Python-common'}
 
-MYFILE = 'xml.snippets'
-MYFILE = 'python.snippets'
-
 KOMODO_SNIPPET_FORMAT = """{
   "keyboard_shortcut": "",
   "name": "%s",
@@ -49,12 +46,6 @@ MAIN_SNIPPETS = [
     'transient', 'widget', 'xpath', 'button'
 ]
 
-# folder to store komodo snippets
-FOLDER = './' + mapping[MYFILE] + '/erp/'
-if not os.path.exists(FOLDER):
-    os.makedirs(FOLDER)
-    os.makedirs(FOLDER + 'sub/')
-
 
 # file config management to ignore or rename snippets (not mandatory)
 txt_message1 = "#puts 1 element by line in this file : %s"
@@ -71,8 +62,8 @@ MESSAGES = [
 VALS_CONF = {}
 
 
-def manage_file_config(file_type, msg_type):
-    file_name = './' + MYFILE + '.4komodo.' + file_type + '.conf'
+def manage_file_config(file_type, msg_type, myfile):
+    file_name = './' + myfile + '.4komodo.' + file_type + '.conf'
     if not os.path.exists(file_name):
         # file creation
         # try:
@@ -104,18 +95,6 @@ def manage_file_config(file_type, msg_type):
         else:
             print ("No datas in files conf")
 
-manage_file_config('exclude', 0)
-manage_file_config('rename', 1)
-custom_snippets = []
-custom_snippets = manage_file_config('add', 2)
-
-print 'VALS_CONF', VALS_CONF
-
-# start of the main process
-ROWS = open(MYFILE, 'r').readlines()
-#if len(custom_snippets) > 0:
-    #ROWS.extend(custom_snippets)
-COMPOSITE_SNIP = {}
 
 def convert_snippet_tag(line):
     # for match in re.findall('\$\{[a-z0-9(): ]+\}', line):
@@ -176,7 +155,6 @@ def create_snippet_file(file_name, snip_name, body):
             folder += 'sub/'
         if snip_name in MAIN_SNIPPETS:
             snip_name = '0' + snip_name
-            print snip_name
         f = open(folder + file_name, 'w')
         f.write( KOMODO_SNIPPET_FORMAT %(snip_name, body) )
         f.close()
@@ -184,24 +162,44 @@ def create_snippet_file(file_name, snip_name, body):
         print ("Impossible to write '%s' file in '%s' folder : "
                "check permissions" % (file_name, FOLDER))
 
-start = -1
-
-for line, row in enumerate(ROWS):
-    if row[:7] == 'snippet':
-        end = line - 1
-        if start > 0:
-            convert_snippet(start, end)
-        start = line
-
-convert_snippet(start, line)
-
-# root snippets creation
-for snip_name, list_sub in COMPOSITE_SNIP.items():
-    core = '\t"' + snip_name + '[[%tabstop:!@#_currentPos!@#_anchor'
-    for index, elm in enumerate(list_sub):
-        core += '' + str(index) + ' ' + elm['sub'] + '",\n\t"'
-        convert_snippet(elm['start'], elm['end'], index)
-    core = core[:-5] + ']]"'
-    create_snippet_file(snip_name + '.komodotool', snip_name, core)
-
-print 'nb COMPOSITE_SNIP', len(COMPOSITE_SNIP)
+for myfile in mapping:
+    # folder to store komodo snippets
+    FOLDER = './' + mapping[myfile] + '/erp/'
+    if not os.path.exists(FOLDER):
+        os.makedirs(FOLDER)
+        os.makedirs(FOLDER + 'sub/')
+    
+    manage_file_config('exclude', 0, myfile)
+    manage_file_config('rename', 1, myfile)
+    custom_snippets = []
+    custom_snippets = manage_file_config('add', 2, myfile)
+    
+    print 'VALS_CONF', VALS_CONF
+    
+    # start of the main process
+    ROWS = open(myfile, 'r').readlines()
+    #if len(custom_snippets) > 0:
+        #ROWS.extend(custom_snippets)
+    COMPOSITE_SNIP = {}
+    
+    start = -1
+    
+    for line, row in enumerate(ROWS):
+        if row[:7] == 'snippet':
+            end = line - 1
+            if start > 0:
+                convert_snippet(start, end)
+            start = line
+    
+    convert_snippet(start, line)
+    
+    # root snippets creation
+    for snip_name, list_sub in COMPOSITE_SNIP.items():
+        core = '\t"' + snip_name + '[[%tabstop:!@#_currentPos!@#_anchor'
+        for index, elm in enumerate(list_sub):
+            core += '' + str(index) + ' ' + elm['sub'] + '",\n\t"'
+            convert_snippet(elm['start'], elm['end'], index)
+        core = core[:-5] + ']]"'
+        create_snippet_file(snip_name + '.komodotool', snip_name, core)
+    
+    print 'nb COMPOSITE_SNIP', len(COMPOSITE_SNIP)
