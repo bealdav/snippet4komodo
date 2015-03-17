@@ -41,11 +41,6 @@ KOMODO_SNIPPET_FORMAT = """{
 }
 """
 
-MAIN_SNIPPETS = [
-    'view', 'field', 'attribute', 'menu',
-    'transient', 'widget', 'xpath', 'button'
-]
-
 
 # file config management to ignore or rename snippets (not mandatory)
 txt_message1 = "#puts 1 element by line in this file : %s"
@@ -153,8 +148,6 @@ def create_snippet_file(file_name, snip_name, body):
         folder = FOLDER
         if snip_name[-1].isdigit():
             folder += 'sub/'
-        if snip_name in MAIN_SNIPPETS:
-            snip_name = '0' + snip_name
         f = open(folder + file_name, 'w')
         f.write( KOMODO_SNIPPET_FORMAT %(snip_name, body) )
         f.close()
